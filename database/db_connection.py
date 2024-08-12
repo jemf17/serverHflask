@@ -1,25 +1,20 @@
 import sqlite3
 #import psycopg2
 
+con = sqlite3.connect("H_M.db").cursor()
 
-async def db_consult(consulta):
-    try:
-        con = sqlite3.connect("H_M.db").cursor()
-        return con.execute(consulta)
-    except Exception as ex:
-        print(ex)
-        return -1
 """
 async def db_connection():
     try:
-        conenccion= await psycopg2.connect(
+        connection= await psycopg2.connect(
             host= '',
             user='',
             password='',
             database=''
         )
         print("coneccion exitosa")
-        return conenccion
+        connection.set_session(autocommit=True)
+        return connection
     except Exception as ex:
         print(ex)
         return -1
