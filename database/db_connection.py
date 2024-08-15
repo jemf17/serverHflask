@@ -1,7 +1,8 @@
 import sqlite3
 #import psycopg2
 
-con = sqlite3.connect("H_M.db").cursor()
+def db_connection():
+    return sqlite3.connect("H_M.db").cursor()
 
 """
 async def db_connection():

@@ -9,7 +9,7 @@ def error_page(error):
 if __name__ == '__main__':
 
     # Blueprint
-    app.register_blueprint(Obra.main, url_prefix='/api/obra')
+    app.register_blueprint(Obra.main, url_prefix='/obra')
 
     # Error handlers
     app.register_error_handler(404, error_page)

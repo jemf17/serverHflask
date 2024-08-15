@@ -1,6 +1,6 @@
 class Obra():
 
-    def __init__(self, id, titulo, portada, oneshot, capitulo, artista, tag = [], vistas = 0, likes = 0, guardados = 0, comentario = []) -> None:
+    def __init__(self, id, titulo, portada, oneshot, capitulo, artista, tag = [], vistas = 0, likes = 0, idioma = [], guardados = 0, comentario = []) -> None:
         self.id = id
         self.titulo = titulo
         self.portada = portada
@@ -10,6 +10,7 @@ class Obra():
         self.tag = tag
         self.vistas = vistas
         self.likes = likes
+        self.idioma = idioma
         self.guardados = guardados
         self.comentario = comentario
     def getId(self):
@@ -47,7 +48,7 @@ class Obra():
         for tag in self.tag:
             tags.append(tag.to_JSON())
         return tags """      
-    def to_JSON_all(self):
+    def to_JSON(self):
     #realizo dos funciones que retornan JSONS diferentes por que va a depender de lo que se necesite, para no saturar al front
     #de datos inecesarios que a lo mejor no utiliza, to_JSON_all; para ver la info de la obra al completo y to_JSON_view;
     #para ver lo basico de la obra
@@ -59,6 +60,7 @@ class Obra():
             'vistas': self.vistas,
             'likes': self.likes,
             'guardados': self.guardados,
+            'idiomas' : self.idioma,
             'capitulos': self.to_JSON_capitulos(),
             'comentarios': self.to_JSON_comentario(),
             'arts': self.to_JSON_artist(),
@@ -69,5 +71,6 @@ class Obra():
         return {
             'id': self.id,
             'titulo': self.titulo,
+            'idiomas' : self.idioma,
             'portada': self.portada
         } #considero si es importante en poner el numero de likes, comentarios y favoritos, consultar con el equipo

@@ -1,2 +1,11 @@
 class Tag():
-    pass
+    
+    def __init__(self, nombre, descripcion) -> None:
+        self.nombre = nombre
+        self.descripcion = descripcion
+
+    def to_JSON(self):
+        return {
+            'nombre': self.nombre,
+            'descripcion': self.descripcion
+        }
