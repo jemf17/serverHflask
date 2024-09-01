@@ -7,7 +7,8 @@ main = Blueprint('obra_blueprint', __name__)
 @main.route('/<id>')
 def get_obra_id(id):
     try:
-        return jsonify({'tu':id})
+        obra = ObraModel.get_obra(id)
+        return jsonify(obra)
     except Exception as ex:
         return jsonify({'message':str(ex)}),500
 #retorna un conjunto de obras con el to_JSON_view recomendadas para un usuario que no esta logueado

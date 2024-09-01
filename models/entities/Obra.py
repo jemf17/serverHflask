@@ -1,6 +1,6 @@
 class Obra():
 
-    def __init__(self, id, titulo, portada, oneshot, vistas = 0, likes = 0, guardados = 0) -> None:
+    def __init__(self, id, titulo, portada, oneshot ,vistas = 0, likes = 0, guardados = 0, capitulo = [], tag = [] ,comentario = [], artista =[]) -> None:
         self.id = id
         self.titulo = titulo
         self.portada = portada
@@ -8,10 +8,10 @@ class Obra():
         self.guardados = guardados
         self.vistas = vistas
         self.likes = likes
-        self.tag = []
-        self.capitulo = []
-        self.artista = [] 
-        self.comentario = []
+        self.tag = tag
+        self.capitulo = capitulo
+        self.artista = artista
+        self.comentario = comentario
     def getId(self):
         return self.id
     def getTitulo(self):
@@ -22,15 +22,6 @@ class Obra():
         return self.vistas
     def getLikes(self):
         return self.likes
-    
-    def addCapitulo(self, cap):
-        self.capitulo.append(cap)
-    def addArtist(self, art):
-        self.artista.append(art)
-    def addComentario(self, com):
-        self.comentario.append(com)
-    def addTag(self, tag):
-        self.tag.append(tag)
     
     def to_JSON(self):
     #realizo dos funciones que retornan JSONS diferentes por que va a depender de lo que se necesite, para no saturar al front
