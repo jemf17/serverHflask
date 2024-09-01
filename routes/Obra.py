@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify
+from models.ObraModel import ObraModel
 
 main = Blueprint('obra_blueprint', __name__)
 
@@ -13,7 +14,8 @@ def get_obra_id(id):
 @main.route('/')
 def get_obras():
     try:
-        return jsonify({'tu':"mamaxdxdxd"})
+        obras = ObraModel.get_obras()
+        return jsonify(obras)
     except Exception as ex:
         return jsonify({'message':str(ex)}),500
 
