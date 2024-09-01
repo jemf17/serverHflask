@@ -2,7 +2,11 @@ import sqlite3
 #import psycopg2
 
 def db_connection():
-    return sqlite3.connect("H_M.db").cursor()
+    try:
+        return sqlite3.connect("H_M.db")
+    except Exception as ex:
+        print(ex)
+        return -1
 
 """
 async def db_connection():

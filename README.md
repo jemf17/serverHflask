@@ -46,6 +46,10 @@ deactivate
 ```
 
 * Install requerimientos.txt
+<<<<<<< HEAD
+=======
+
+>>>>>>> consultaObra
 > within the already activated virtual environment
 ```
 pip install requerimientos.txt
@@ -63,7 +67,11 @@ pip freeze > requerimientos.txt
 
 It is divided into 
 * routes 
+<<<<<<< HEAD
 * models 
+=======
+* models
+>>>>>>> consultaObra
 * DB 
 > for the moment in a DB in SQLite
 
