@@ -45,5 +45,8 @@ class Obra():
         return {
             'id': self.id,
             'titulo': self.titulo,
-            'portada': self.portada
+            'portada': self.portada,
+            'vistas' : self.vistas,
+            'likes' : self.likes,
+            'guardados': self.guardados
         } #considero si es importante en poner el numero de likes, comentarios y favoritos, consultar con el equipo

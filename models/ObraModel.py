@@ -10,7 +10,7 @@ class ObraModel():
             conection = db_connection()
             obras = []
             with closing(conection.cursor()) as cursor:
-                cursor.execute("SELECT id, titulo, portada, oneshot, (SELECT count(*) FROM Historiales WHERE Historiales.id_obra = Obras.id) as views, (SELECT count(*) FROM Historiales WHERE Historiales.id_obra = Obras.id AND Historiales.favorito != 0) as like, (SELECT count(*) FROM Historiales WHERE Historiales.id_obra = Obras.id AND Historiales.guardado != 0) as guardado FROM Obras") 
+                cursor.execute("SELECT id, titulo, portada, oneshot, (SELECT count(*) FROM Historiales WHERE Historiales.id_obra = Obras.id) as views, (SELECT count(*) FROM Favoritos_Guardados WHERE guardado = 1 AND Favoritos_Guardados.id_obra = Obras.id) as like, (SELECT count(*) FROM Favoritos_Guardados WHERE guardado = 1 AND Favoritos_Guardados.id_obra = Obras.id) as guardado FROM Obras") 
                 resultset = cursor.fetchall()
                 for row in resultset:
                     obra = Obra(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
@@ -24,12 +24,15 @@ class ObraModel():
     @classmethod
     def get_obra(self, id):
         try:
+            #las subconsultas de fav y guardados tienen que ser asi, por un tema de que se pueden generar conflictos si los
+            #registramos en el historial
+            #SELECT count(*) FROM Favoritos_Guardados WHERE guardado = 1 AND id_obra = 2
             conection = db_connection()
             with closing(conection.cursor()) as cursor:
-                cursor.execute(f"SELECT id, titulo, portada, oneshot, (SELECT count(*) FROM Historiales WHERE Historiales.id_obra = Obras.id) as views, (SELECT count(*) FROM Historiales WHERE Historiales.id_obra = Obras.id AND Historiales.favorito != 0) as like, (SELECT count(*) FROM Historiales WHERE Historiales.id_obra = Obras.id AND Historiales.guardado != 0) as guardado FROM Obras WHERE id={id}")
+                cursor.execute(f"SELECT id, titulo, portada, oneshot, (SELECT count(*) FROM Historiales WHERE Historiales.id_obra = Obras.id) as views, (SELECT count(*) FROM Favoritos_Guardados WHERE favorito = 1 AND Favoritos_Guardados.id_obra = {id}) as like, (SELECT count(*) FROM Favoritos_Guardados WHERE guardado = 1 AND Favoritos_Guardados.id_obra = {id}) as guardado FROM Obras WHERE id={id}")
                 row = cursor.fetchone()
                 obra = None
-                if row == row:
+                if row != None:
                     capitulos = CapituloModel.get_capitulos_by_obra(id)
                     tags = TagModel.get_tag_name(id)
                     obra = Obra(row[0], row[1], row[2], row[3],row[4], row[5], row[6], capitulos, tags)
@@ -54,3 +57,25 @@ class ObraModel():
     @classmethod
     def get_obras_for_user(self, id):
         pass
+    @classmethod
+    def push_historial(self, historial):
+        pass
+    
+    @classmethod
+    def get_f_g_obra_for_user(self, user, obra):
+        try:
+            conection = db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f'SELECT favorito, guardado FROM Favoritos_Guardados WHERE id_user = {user} AND id_obra = {obra}')
+                row = cursor.fetchone()
+                if row != None:
+                    return {
+                        "favorito": row[0],
+                        "guardado": row[1]
+                    }
+                return {
+                        "favorito": False,
+                        "guardado": False
+                    }
+        except Exception as ex:
+            raise Exception(ex)
