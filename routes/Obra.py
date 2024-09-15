@@ -1,10 +1,10 @@
 from flask import Blueprint, jsonify, request
 from models.ObraModel import ObraModel
 
-main = Blueprint('obra_blueprint', __name__)
+mainObra = Blueprint('obra_blueprint', __name__)
 
 #retorna una obra por id
-@main.route('/<id>')
+@mainObra.route('/<id>')
 def get_obra_id(id):
     try:
         obra = ObraModel.get_obra(id)
@@ -12,7 +12,7 @@ def get_obra_id(id):
     except Exception as ex:
         return jsonify({'message':str(ex)}),500
 #retorna un conjunto de obras con el to_JSON_view recomendadas para un usuario que no esta logueado
-@main.route('/')
+@mainObra.route('/')
 def get_obras():
     try:
         obras = ObraModel.get_obras()
@@ -21,14 +21,14 @@ def get_obras():
         return jsonify({'message':str(ex)}),500
 
 #retorna un conjunto de obras con el to_JSON_view recomendasas por basada en sus tags mas buscados y en las vistas de otros usuarios con su mismas o parecidos gustos , para usuarios logeados
-@main.route('/user/<id>')
+@mainObra.route('/user/<id>')
 def get_obras_for_user(id):
     try:
         return jsonify({'tu':"mama"})
     except Exception as ex:
         return jsonify({'message':str(ex)}),500
 #retorna todas las obras que hizo el artista
-@main.route('/artist/<id>')
+@mainObra.route('/artist/<id>')
 def get_obras_for_artist(id):
     try:
         return jsonify({'tu':"mama"})
@@ -36,7 +36,7 @@ def get_obras_for_artist(id):
         return jsonify({'message':str(ex)}),500
     
 #registra una obra, hay que ver si puede estar vacia o no, pero de que la agrega, la agrega
-@main.route('/add', methods=['POST'])
+@mainObra.route('/add', methods=['POST'])
 def add_obra():
     try:
         pass
@@ -44,7 +44,7 @@ def add_obra():
         return jsonify({'message':str(ex)}),500
 
 #elimina una obra en espesifico por si hay un artista takito y decile eliminar su obra maestra *incerte cara de moai*
-@main.route('/delete/<id>', methods=['DELETE'])
+@mainObra.route('/delete/<id>', methods=['DELETE'])
 def delete_obra(id):
     try:
         pass
@@ -52,7 +52,7 @@ def delete_obra(id):
         return jsonify({'message':str(ex)}),500
 
 #actualiza una obra por id, ya sea por que quiera actualizar la portada, el nombre o qsy    
-@main.route('/update/<id>', methods=['PUT'])
+@mainObra.route('/update/<id>', methods=['PUT'])
 def update_obra(id):
     try:
         pass
@@ -60,7 +60,7 @@ def update_obra(id):
         return jsonify({'message':str(ex)}),500
 
 #ej: /userfg?user=1&obra=1
-@main.route('/userfg')
+@mainObra.route('/userfg')
 def get_fg_obra_by_user():
     try:
         id_user = request.args.get("user")
