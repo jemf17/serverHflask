@@ -43,6 +43,7 @@ class CapituloModel():
             pass
         except Exception as ex:
             raise Exception(ex)
+    @classmethod
     def delete_capitulo(self, id):
         try:
             pass

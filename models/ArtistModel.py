@@ -1,6 +1,7 @@
 from database.db_connection import db_connection
 from .entities.Artista import Artista
 
+
 class ArtistModel():
     @classmethod
     def get_all_artists(self):
