@@ -32,8 +32,14 @@ class PageModel():
         except Exception as ex:
             raise Exception(ex)
     @classmethod
-    def post_page(self, page):
+    def add_page(self, page, capNumero, obraName):
         try:
-            pass
+            """
+            datos para agregar: imagen:bytea, orden: int => para hacer subconsultas: CapNumero: Int, ObraName: varchar
+            """
+            conection = db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"INSERT INTO Pages (imagen, orden, id_capitulo) VALUES ({page.imagen}, {page.orden},SELECT id FROM Capitulos WHERE Capitulos.numero = {capNumero} AND Capitulos.id_obra = (SELECT obras.id FROM Obras WHERE Obras.titulo = {obraName}) )")
+                conection.commit()
         except Exception as ex:
             raise Exception(ex)

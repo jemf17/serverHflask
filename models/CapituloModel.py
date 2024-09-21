@@ -38,9 +38,19 @@ class CapituloModel():
         except Exception as ex:
             raise Exception(ex)
     @classmethod
-    def post_capitulo(self, cap):
+    def add_capitulo(self, cap):
         try:
-            pass
+            """
+            datos para agregar: numero:int, fecha:date, idioma: id_idioma, id_obra: titulo de obra, pages: [pages]
+            """
+            conection = db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"INSERT INTO Capitulos (numero, fecha, id_idioma, id_obra) VALUES ({cap.numero},{cap.fecha},{cap.id_idioma}, (SELECT id FROM Obras WHERE titulo = {cap.obra}))")
+                conection.commit()
+                for page in cap.pages:
+                    PageModel.add_page(page, cap.numero, cap.obra)
+                afect_rows = cursor.rowcount
+            return afect_rows
         except Exception as ex:
             raise Exception(ex)
     @classmethod

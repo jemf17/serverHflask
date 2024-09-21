@@ -12,8 +12,22 @@ class Artista(Usuario):
         return {
             "userName": self.userName,
             "email": self.email,
-            "descripcion": self.descripcion,
             "perfilF" : self.perfil,
+            "fechaDeCreacion": self.fechadeCreacion,
+            "obras": self.obras,
+            "pedidos": self.pedidos,
+            "solicitudes": self.solicitudes
+        }
+    def to_JSON_view_name(self):
+        return {
+            "userName" : self.userName
+        }
+    def to_JSON_view(self):
+        return {
+            "userName": self.userName,
+            "email": self.email,
+            "perfilF" : self.perfil,
+            "descripcion": self.descripcion,
             "fechaDeCreacion": self.fechadeCreacion,
             "obras": self.obras,
             "pedidos": self.pedidos,

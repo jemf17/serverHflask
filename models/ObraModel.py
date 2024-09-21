@@ -52,8 +52,27 @@ class ObraModel():
     def delete_obra(self, id):
         pass
     @classmethod
-    def post_obra(self, obra):
-        pass
+    def add_obra(self, obra):
+        try:
+            """
+            datos para agregar: titulo:varchar, portada:bytea, oneshot:bool, tags:[id], id_artista
+            """
+            conection = db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"INSERT INTO Obras (titulo, portada, oneshot) VALUES ({obra.titulo}, {obra.portada},{obra.oneshot})")
+                conection.commit()
+                #registra primero el artista que posteo la obra, el resto vendra atravez de las invitaciones
+                #tendre que ver si es mejor llamar la funcion aca o con solo esta consulta basta
+                cursor.execute(f"INSERT INTO Obras_Arts (id_obra, id_artist) VALUES ((SELECT id FROM Obras WHERE titulo = {obra.titulo}), {obra.artist})")
+                conection.commit()
+                for tag in obra.tag:
+                    cursor.execute(f"INSERT INTO Obra_Tag (id_obra, id_tag) VALUES((SELECT id FROM Obras WHERE titulo = {obra.titulo}),{tag})")
+                    conection.commit()
+                afect_rows = cursor.rowcount
+                #agregar un metodo en CapituloModel donde agrege los capitulos, en el front se tiene que ejecutar despues de agregar la obra
+            return afect_rows
+        except Exception as ex:
+            raise Exception(ex)
     @classmethod
     def get_obras_for_user(self, id):
         pass
