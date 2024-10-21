@@ -1,35 +1,32 @@
-import sqlite3
-#import psycopg2
+#import sqlite3
+import os
+import psycopg2
+from dotenv import load_dotenv
 
+load_dotenv()
+
+'''
 def db_connection():
     try:
         return sqlite3.connect("H_M.db")
     except Exception as ex:
         print(ex)
         return -1
+'''
 
-"""
-async def db_connection():
+
+
+def db_connection():
     try:
-        connection= await psycopg2.connect(
-            host= '',
-            user='',
-            password='',
-            database=''
+        connection=  psycopg2.connect(
+            host= os.getenv('PG_HOST'),
+            user=os.getenv('PG_USER'),
+            password=os.getenv('PG_PASSWORD'),
+            database=os.getenv('PG_BD')
         )
-        print("coneccion exitosa")
+        print("coneccion exitosa" )
         connection.set_session(autocommit=True)
         return connection
     except Exception as ex:
-        print(ex)
+        print("hay error", ex)
         return -1
-
-async def db_consult(consulta):
-    try:
-        db = await db_connection()
-        cursor = db.cursor()
-        return cursor.execute(consulta)
-    except Exception as ex:
-        print(ex)
-        return -1
-"""

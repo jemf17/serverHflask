@@ -1,6 +1,7 @@
 from database.db_connection import db_connection
 from .entities.Page import Page
 from contextlib import closing
+from helper.img_save import save_img
 
 class PageModel():
     @classmethod
@@ -32,14 +33,19 @@ class PageModel():
         except Exception as ex:
             raise Exception(ex)
     @classmethod
-    def add_page(self, page, capNumero, obraName):
+    def add_page(self, page, capNumero, obra_id):
         try:
             """
-            datos para agregar: imagen:bytea, orden: int => para hacer subconsultas: CapNumero: Int, ObraName: varchar
+            datos para agregar: imagen:bytea, orden: int => para hacer subconsultas: CapNumero: Int, obra_id: varchar
             """
             conection = db_connection()
+            img_url =  save_img(page.image)
+            if img_url == -1:
+                return -1
             with closing(conection.cursor()) as cursor:
-                cursor.execute(f"INSERT INTO Pages (imagen, orden, id_capitulo) VALUES ({page.imagen}, {page.orden},SELECT id FROM Capitulos WHERE Capitulos.numero = {capNumero} AND Capitulos.id_obra = (SELECT obras.id FROM Obras WHERE Obras.titulo = {obraName}) )")
+                cursor.execute(f"INSERT INTO Pages (imagen, orden, numero_cap, id_obra) VALUES ({img_url}, {page.orden},{capNumero},{obra_id})")
                 conection.commit()
+                afect_rows = cursor.rowcount
+            return afect_rows
         except Exception as ex:
             raise Exception(ex)

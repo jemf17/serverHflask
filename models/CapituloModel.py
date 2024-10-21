@@ -2,6 +2,8 @@ from database.db_connection import db_connection
 from .entities.Capitulo import Capitulo
 from contextlib import closing
 from models.PageModel import PageModel
+from concurrent.futures import ThreadPoolExecutor
+
 
 class CapituloModel():
     
@@ -38,18 +40,20 @@ class CapituloModel():
         except Exception as ex:
             raise Exception(ex)
     @classmethod
-    def add_capitulo(self, cap):
+    def add_capitulo(self, cap, obraid):
         try:
             """
             datos para agregar: numero:int, fecha:date, idioma: id_idioma, id_obra: titulo de obra, pages: [pages]
             """
             conection = db_connection()
             with closing(conection.cursor()) as cursor:
-                cursor.execute(f"INSERT INTO Capitulos (numero, fecha, id_idioma, id_obra) VALUES ({cap.numero},{cap.fecha},{cap.id_idioma}, (SELECT id FROM Obras WHERE titulo = {cap.obra}))")
+                cursor.execute(f"""INSERT INTO Capitulos (numero, id_obra, fecha, id_idioma) VALUES ({cap.numero},{obraid},{cap.fecha},{cap.id_idioma})""")
                 conection.commit()
-                for page in cap.pages:
-                    PageModel.add_page(page, cap.numero, cap.obra)
                 afect_rows = cursor.rowcount
+                with ThreadPoolExecutor as tx:
+                    for page in cap.pages:
+                        afect_rows += tx.submit(PageModel.add_page(page, cap.numero, obraid))
+                
             return afect_rows
         except Exception as ex:
             raise Exception(ex)

@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from models.ObraModel import ObraModel
+from models.entities.Obra import Obra
 
 mainObra = Blueprint('obra_blueprint', __name__)
 
@@ -8,6 +9,8 @@ mainObra = Blueprint('obra_blueprint', __name__)
 def get_obra_id(id):
     try:
         obra = ObraModel.get_obra(id)
+        if obra == None:
+            return jsonify({'message': None})
         return jsonify(obra)
     except Exception as ex:
         return jsonify({'message':str(ex)}),500
@@ -16,6 +19,9 @@ def get_obra_id(id):
 def get_obras():
     try:
         obras = ObraModel.get_obras()
+        print(obras)
+        if obras == []:
+            return jsonify({'message': None})
         return jsonify(obras)
     except Exception as ex:
         return jsonify({'message':str(ex)}),500
@@ -28,8 +34,8 @@ def get_obras_for_user(id):
     except Exception as ex:
         return jsonify({'message':str(ex)}),500
 #retorna todas las obras que hizo el artista
-@mainObra.route('/artist/<id>')
-def get_obras_for_artist(id):
+@mainObra.route('/<artist>/<id>')
+def get_obras_for_artist(artist,id):
     try:
         return jsonify({'tu':"mama"})
     except Exception as ex:
@@ -39,7 +45,15 @@ def get_obras_for_artist(id):
 @mainObra.route('/add', methods=['POST'])
 def add_obra():
     try:
-        pass
+        titulo = request.json['title']
+        portada = request.json['portada']
+        oneshot = request.json['oneshot']
+        madure = request.json['madure']
+        obra = Obra(0, titulo, portada, oneshot, madure)
+        affec_row = ObraModel.add_obra(obra, request.json['tags'],request.json['artista'])
+        if affec_row == 0:
+            return jsonify({'message': "Error on insert"})
+        return jsonify({'message':"Ok"})
     except Exception as ex:
         return jsonify({'message':str(ex)}),500
 
