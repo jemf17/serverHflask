@@ -1,11 +1,11 @@
 class Page():
-    def __init__(self, id, numero, image) -> None:
+    def __init__(self, id, numero, image, orden) -> None:
         self.id = id
         self.numero = numero
         self.image = image
+        self.orden = orden
     def to_JSON(self):
         return {
-            "id": self.id,
-            "numero": self.numero,
-            "image": self.image
+            "image": self.image,
+            "orden": self.orden
         }

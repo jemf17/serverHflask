@@ -1,4 +1,4 @@
-from database.db_connection import db_connection
+from database.db_connection import DB
 from entities.Traductor import Traductor
 
 

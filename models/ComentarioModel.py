@@ -1,13 +1,23 @@
-from database.db_connection import db_connection
+from database.db_connection import DB
 from .entities.Comentario import Comentario
 from contextlib import closing
+from concurrent.futures import ThreadPoolExecutor
 
 class ComentarioModel():
 
     @classmethod
     def get_all_coments_by_obra(self, id_obra):
         try:
-            pass
+            coments = list()
+            conection = DB().db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""SELECT fecha, comentario, id_user FROM comentarios c WHERE id_obra = '{id_obra}'""")
+                result = cursor.fetchall()
+                with ThreadPoolExecutor() as tx:
+                    for row in result:
+                        coment = Comentario(row[0],row[1],row[2])
+                        coments.append(coment.to_JSON())
+            return coments
         except Exception as ex:
             raise Exception(ex)
     @classmethod

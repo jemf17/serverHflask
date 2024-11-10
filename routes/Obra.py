@@ -1,6 +1,8 @@
 from flask import Blueprint, jsonify, request
 from models.ObraModel import ObraModel
 from models.entities.Obra import Obra
+from models.entities.Capitulo import Capitulo
+import uuid
 
 mainObra = Blueprint('obra_blueprint', __name__)
 
@@ -45,12 +47,9 @@ def get_obras_for_artist(artist,id):
 @mainObra.route('/add', methods=['POST'])
 def add_obra():
     try:
-        titulo = request.json['title']
-        portada = request.json['portada']
-        oneshot = request.json['oneshot']
-        madure = request.json['madure']
-        obra = Obra(0, titulo, portada, oneshot, madure)
-        affec_row = ObraModel.add_obra(obra, request.json['tags'],request.json['artista'])
+        obra = Obra(uuid.UUID(request.json['id']), request.json['title'],request.json['secondtitle'], request.json['portada'], request.json['oneshot'], request.json['madure'])
+        cap = Capitulo(request.json['numero'], request.json['fecha'], request.json['idioma'], request.json['pages'])
+        affec_row = ObraModel.add_obra(obra, request.json['tags'],uuid.UUID(request.json['artista']), cap)
         if affec_row == 0:
             return jsonify({'message': "Error on insert"})
         return jsonify({'message':"Ok"})
@@ -84,3 +83,18 @@ def get_fg_obra_by_user():
     except Exception as ex:
         return jsonify({'message':str(ex)}),500
     
+@mainObra.route('/exist')
+def exist_obra():
+    try:
+        title = request.args.get('title').replace('-', ' ')
+        print(title)
+        return jsonify({'exist':ObraModel.exist_obra(title)})
+    except Exception as ex:
+        return jsonify({'message':str(ex)}),500
+
+@mainObra.route('/getuuid')
+def create_uuid():
+    try:
+        return jsonify(ObraModel.create_uuid())
+    except Exception as ex:
+        return jsonify({'message':str(ex)}),500

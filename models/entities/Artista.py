@@ -1,4 +1,4 @@
-from entities import Usuario
+from .Usuario import Usuario
 
 class Artista(Usuario):
     #tengo que ver como generar las instancias de invitaciones en el diagrama de clases

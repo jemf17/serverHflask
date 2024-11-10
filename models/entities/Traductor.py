@@ -1,4 +1,4 @@
-from entities import Usuario
+from .Usuario import Usuario
 
 class Traductor(Usuario):
     def __init__(self, calificacion, capitulosTraducidos = [], trabajosP=[], idiomas = [] ,*args, **kwargs) -> None:
