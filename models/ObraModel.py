@@ -14,7 +14,7 @@ class ObraModel():
             conection = DB().db_connection()
             obras = []
             with closing(conection.cursor()) as cursor:
-                cursor.execute("""SELECT romance,id, titulo, titulo_secundario, portada, oneshot, madure, (SELECT v.visualizacion FROM vistas v WHERE o.id = v.id_obra) as views, (SELECT v.favoritos FROM vistas v WHERE o.id = v.id_obra) as favoritos, (SELECT v.guardados FROM vistas v WHERE o.id = v.id_obra) as guardados FROM obras o;""") 
+                cursor.execute("""SELECT romance,id, titulo, titulo_secundario, portada, oneshot, madure, v.visualizacion, v.favoritos, v.guardados  FROM obras o inner join vistas v on v.id_obra = o.id""") 
                 resultset = cursor.fetchall()
                 for row in resultset:
                     obra = Obra(row[0], row[1],row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9])
@@ -30,7 +30,7 @@ class ObraModel():
         try:
             conection = DB().db_connection()
             with closing(conection.cursor()) as cursor:
-                cursor.execute(f"""SELECT id, titulo, portada, oneshot, (SELECT v.visualizacion FROM vistas v WHERE v.id_obra = '{id}' ) as views,  (SELECT v.favoritos FROM vistas v WHERE v.id_obra = '{id}' ) as like, (SELECT v.guardados FROM vistas v WHERE v.id_obra = '{id}' ) as guardado, titulo_secundario,madure FROM Obras WHERE id='{id}'""")
+                cursor.execute(f"""SELECT id, titulo, portada, oneshot, v.visualizacion , v.favoritos , v.guardados , titulo_secundario,madure FROM Obras o inner join vistas v on v.id_obra = o.id WHERE id='{id}'""")
                 row = cursor.fetchone()
                 obra = None
                 if row != None:
@@ -131,5 +131,22 @@ class ObraModel():
                 cursor.execute("""select generar_uuid_unico()""")
                 result = cursor.fetchone()[0]
                 return result
+        except Exception as ex:
+            raise Exception(ex)
+    
+    @classmethod
+    def like_obra(self, id_obra, id_user):
+        try:
+            conection = DB().db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""SELECT fav_obra('{id_obra}', '{id_user}') """)
+        except Exception as ex:
+            raise Exception(ex)
+    @classmethod
+    def save_obra(self, id_obra, id_user):
+        try:
+            conection = DB().db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""SELECT save_obra('{id_obra}', '{id_user}')""")
         except Exception as ex:
             raise Exception(ex)

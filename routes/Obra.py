@@ -98,3 +98,19 @@ def create_uuid():
         return jsonify(ObraModel.create_uuid())
     except Exception as ex:
         return jsonify({'message':str(ex)}),500
+
+@mainObra.route('/save/<id_obra>/<id_user>')
+def save(id_obra, id_user):
+    try:
+        ObraModel.save_obra(id_obra, id_user)
+        return jsonify({'message': 'Ok'})
+    except Exception as ex:
+        return jsonify({'message':str(ex)}),500
+
+@mainObra.route('/fav/<id_obra>/<id_user>')
+def fav(id_obra, id_user):
+    try:
+        ObraModel.like_obra(id_obra, id_user)
+        return jsonify({'message': 'Ok'})
+    except Exception as ex:
+        return jsonify({'message':str(ex)}),500

@@ -1,5 +1,5 @@
 from database.db_connection import DB
-from .entities.Comentario import Comentario
+from .entities.Comentario import *
 from contextlib import closing
 from concurrent.futures import ThreadPoolExecutor
 
@@ -15,8 +15,8 @@ class ComentarioModel():
                 result = cursor.fetchall()
                 with ThreadPoolExecutor() as tx:
                     for row in result:
-                        coment = Comentario(row[0],row[1],row[2])
-                        coments.append(coment.to_JSON())
+                        coment = ContextComentario(ComentUser(row[0],row[1],row[2]))
+                        coments.append(coment.someone_strategy_json_coment())
             return coments
         except Exception as ex:
             raise Exception(ex)
@@ -35,6 +35,15 @@ class ComentarioModel():
     @classmethod
     def get_all_coments_by_user(self, id_user):
         try:
-            pass
+            coments = list()
+            conection = DB().db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""SELECT fecha, comentario, id_obra FROM comentarios c WHERE id_user = '{id_user}'""")
+                result = cursor.fetchall()
+                with ThreadPoolExecutor() as tx:
+                    for row in result:
+                        coment = ContextComentario(ComentObra(row[0],row[1],row[2]))
+                        coments.append(coment.someone_strategy_json_coment())
+            return coments
         except Exception as ex:
             raise Exception(ex)

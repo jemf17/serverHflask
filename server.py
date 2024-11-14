@@ -1,5 +1,5 @@
 from flask import Flask
-from routes import Obra, Capitulo
+from routes import Obra, Capitulo, Comentario
 
 app = Flask(__name__)
 
@@ -12,7 +12,7 @@ if __name__ == '__main__':
     #agregar un name cada vez que se registre un blueprint nuevo uwu
     app.register_blueprint(Capitulo.mainCapi, url_prefix='/capi', name='Capi')
     app.register_blueprint(Obra.mainObra, url_prefix='/obra', name='Obra')
-    
+    app.register_blueprint(Comentario.mainComent, url_prefix='/coment', name='Coment')
     # Error handlers
     app.register_error_handler(404, error_page)
     app.run(debug=True, threaded=True, port=5070)
