@@ -72,16 +72,6 @@ def update_obra(id):
     except Exception as ex:
         return jsonify({'message':str(ex)}),500
 
-#ej: /userfg?user=1&obra=1
-@mainObra.route('/userfg')
-def get_fg_obra_by_user():
-    try:
-        id_user = request.args.get("user")
-        id = request.args.get("obra")
-        obra = ObraModel.get_f_g_obra_for_user(id_user,id)
-        return jsonify(obra)
-    except Exception as ex:
-        return jsonify({'message':str(ex)}),500
     
 @mainObra.route('/exist')
 def exist_obra():
