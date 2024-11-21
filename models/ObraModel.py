@@ -45,22 +45,33 @@ class ObraModel():
         except Exception as ex:
             raise Exception(ex)
     @classmethod
-    def get_obras_for_arts(self, id):
+    def get_obras_for_arts(self, id_arts):
         try:
-            pass
+            conection = DB().db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""SELECT romance,id, titulo, titulo_secundario, portada, oneshot, madure, v.visualizacion, v.favoritos, v.guardados  FROM obras o inner join vistas v on v.id_obra = o.id where exists (select oa.id_obra from obras_artistas oa where oa.id_arts = '{id_arts}' and oa.id_obra = o.id )""")
+                conection.commit()
+                return 'Ok'
         except Exception as ex:
             raise Exception(ex)        
     @classmethod
-    def update_obra(self, id):
+    def update_obra(self, obra):
         try:
-            pass
+            conection = DB().db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""UPDATE obras SET portada ='{obra.portada}', titulo ='{obra.titulo}', oneshot={obra.oneshot}, madure={obra.madure}, titulo_secundario='{obra.titulosecu}' WHERE id = '{obra.id}'""")
+                conection.commit()
+                return 'Ok'
         except Exception as ex:
             raise Exception(ex)
     
     @classmethod
     def delete_obra(self, id):
         try:
-            pass
+            conection = DB().db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""DELETE FROM obras WHERE id = {id}""")
+                return 'Ok'
         except Exception as ex:
             raise Exception(ex)
     @classmethod
@@ -84,7 +95,7 @@ class ObraModel():
                 conection.commit()
                 #registra primero el artista que posteo la obra, el resto vendra atravez de las invitaciones
                 #tendre que ver si es mejor llamar la funcion aca o con solo esta consulta basta
-                cursor.execute(f"""INSERT INTO Obras_artistas (id_obra, id_arts) VALUES ('{obra.id}', '{arts}')""")
+                cursor.execute(f"""INSERT INTO Obras_artistas (id_obra, id_arts, push) VALUES ('{obra.id}', '{arts}', true)""")
                 conection.commit()
                 for tag in tags:
                     cursor.execute(f"""INSERT INTO Obras_Tags (id_obra, tag) VALUES('{obra.id}','{tag}')""")

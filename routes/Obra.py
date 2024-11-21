@@ -60,7 +60,7 @@ def add_obra():
 @mainObra.route('/delete/<id>', methods=['DELETE'])
 def delete_obra(id):
     try:
-        pass
+        return jsonify({'message': ObraModel.delete_obra(uuid.UUID(id))})
     except Exception as ex:
         return jsonify({'message':str(ex)}),500
 
@@ -68,16 +68,17 @@ def delete_obra(id):
 @mainObra.route('/update/<id>', methods=['PUT'])
 def update_obra(id):
     try:
-        pass
+        obra = Obra(uuid.UUID(id), request.json['title'],request.json['secondtitle'], request.json['portada'], request.json['oneshot'], request.json['madure'])
+        return jsonify({'message': ObraModel.update_obra(obra)})
     except Exception as ex:
         return jsonify({'message':str(ex)}),500
 
     
-@mainObra.route('/exist')
-def exist_obra():
+@mainObra.route('/exist/<title>')
+def exist_obra(title):
     try:
-        title = request.args.get('title').replace('-', ' ')
-        print(title)
+        #title = request.args.get('title').replace('-', ' ')
+        #print(title)
         return jsonify({'exist':ObraModel.exist_obra(title)})
     except Exception as ex:
         return jsonify({'message':str(ex)}),500
