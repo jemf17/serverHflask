@@ -83,6 +83,16 @@ www.link.com/obra/add
 >> push obra
 
 ```
+www.link.com/obra/update/<id>
+```
+>> actualiza una obra
+
+```
+www.link.com/obra/delete/<id>
+```
+>> elimina una obra
+
+```
 www.link.com/obra/fav/<id_obra>/<id_user>
 ```
 >> ya fue el ingles, registra el like que un usuario le da a la obra, es un get pero funcionaria como un push
@@ -98,9 +108,9 @@ www.link.com/obra/getuuid
 >> retorna un uuid unico y verificado en la BD, esto sirve por que desde el front se deben guardar las imagenes en otro server
 
 ```
-www.link.com/obra/exist
+www.link.com/obra/exist/<title>
 ```
->> retorna si la obra existe en la bd, para evitar errores con el guardado de los dos servidores
+>> retorna si una obra con ese titulo existe en la bd, para evitar errores con el guardado de los dos servidores
 
 ```
 www.link.com/obra/<id>
