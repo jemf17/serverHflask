@@ -5,6 +5,8 @@ from models.CapituloModel import CapituloModel
 from models.TagModel import TagModel
 from models.ArtistModel import ArtistModel
 from models.ComentarioModel import ComentarioModel
+import pandas as pd
+import numpy as np
 #from helper.img_save import save_img
 
 class ObraModel():    
@@ -61,7 +63,8 @@ class ObraModel():
             with closing(conection.cursor()) as cursor:
                 cursor.execute(f"""UPDATE obras SET portada ='{obra.portada}', titulo ='{obra.titulo}', oneshot={obra.oneshot}, madure={obra.madure}, titulo_secundario='{obra.titulosecu}' WHERE id = '{obra.id}'""")
                 conection.commit()
-                return 'Ok'
+                afect_rows = cursor.rowcount
+                return afect_rows
         except Exception as ex:
             raise Exception(ex)
     
@@ -71,7 +74,9 @@ class ObraModel():
             conection = DB().db_connection()
             with closing(conection.cursor()) as cursor:
                 cursor.execute(f"""DELETE FROM obras WHERE id = {id}""")
-                return 'Ok'
+                conection.commit()
+                afect_rows = cursor.rowcount
+                return afect_rows
         except Exception as ex:
             raise Exception(ex)
     @classmethod
@@ -108,7 +113,16 @@ class ObraModel():
             raise Exception(ex)
     @classmethod
     def get_obras_for_user(self, id):
-        pass
+        try:
+            conection = DB().db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""select tag1, tag2, tag3, tag4, tag5, tag6, v1, v2, v3, v4, v5, v6 from preferencias p where p.id_user = {id}""")
+                row_user =  cursor.fetchone()
+                #user_np = np.array(row_user[0:5], row_user[6:12])
+                user_pd = pd.DataFrame([row_user[0:5], row_user[6:12]], columns=['tag1, tag2, tag3, tag4, tag5, tag6'], index=['tags', 'value'])
+                cursor.execute(f"""""")
+        except Exception as ex:
+            raise Exception(ex)
     @classmethod
     def push_historial(self, historial):
         pass

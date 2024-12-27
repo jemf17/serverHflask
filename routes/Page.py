@@ -1,26 +1,26 @@
-from flask import Blueprint, jsonify, request
+from fastapi import APIRouter, UploadFile, Path, Body
 from models.PageModel import PageModel
 from models.entities.Page import Page
 
-mainPage = Blueprint('page_blueprint', __name__)
+mainPage = APIRouter(prefix="/page", tags=['pages'], responses={404: {"description": "Not found"}})
 
-@mainPage.route('/add', methods=['POST'])
+@mainPage.post('/add')
 def add_page():
     try:
         pass
     except Exception as ex:
-        return jsonify({'message':str(ex)}),500
+        return {'message':str(ex),'status':500}
 
-@mainPage.route('/putpage', methods=['PUT']) #o PATCH, no se cual es mejor xd
+@mainPage.put('/putpage') #o PATCH, no se cual es mejor xd
 def upload_page():
     try:
         pass
     except Exception as ex:
-        return jsonify({'message':str(ex)}),500
+        return {'message':str(ex),'status':500}
     
-@mainPage.route('/delete', methods=['DELETE'])
+@mainPage.delete('/delete')
 def delete_page():
     try:
         pass
     except Exception as ex:
-        return jsonify({'message':str(ex)}),500
+        return {'message':str(ex),'status':500}

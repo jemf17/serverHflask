@@ -21,15 +21,25 @@ class ComentarioModel():
         except Exception as ex:
             raise Exception(ex)
     @classmethod
-    def add_coment(self, coment):
+    def add_coment(self, id_obra ,coment):
         try:
-            pass
+            conection = DB().db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""insert into comentarios (id_user, id_obra, fecha, comentario) values ('{coment.usuario}','{id_obra}', '{coment.fecha}', '{coment.descripcion}')""")
+                conection.commit()
+                afect_rows = cursor.rowcount
+                return afect_rows
         except Exception as ex:
             raise Exception(ex)
     @classmethod
     def delete_coment(self, id_coment):
         try:
-            pass
+            conection = DB().db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""delete from comentarios where id = '{id_coment}'""")
+                conection.commit()
+                afect_rows = cursor.rowcount
+                return afect_rows
         except Exception as ex:
             raise Exception(ex)
     @classmethod

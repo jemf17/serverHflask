@@ -1,27 +1,25 @@
-from flask import Blueprint, jsonify, request
+from fastapi import APIRouter, UploadFile, Path, Body
 from models.CapituloModel import CapituloModel
 from models.entities.Capitulo import Capitulo
+from uuid import UUID
 
-mainCapi = Blueprint('obra_blueprint', __name__)
+mainCapi = APIRouter(prefix="/cap", tags=['capitulo'], responses={404: {"description": "Not found"}})
 
-@mainCapi.route('/<obra_id>/<numero>')
-def get_capi(obra_id, numero):
+@mainCapi.get('/{obra_id}/{numero}')
+async def get_capi(obra_id: UUID = Path(...), numero: int = Path(...)):
     try:
         capi = CapituloModel.get_capitulo_by_obra(obra_id, numero)
-        return jsonify(capi)
+        return (capi)
     except Exception as ex:
-        return jsonify({'message':str(ex)}),500
+        return ({'message':str(ex)}),500
     
-@mainCapi.route('/add', methods=['POST'])
-def add_capitulo():
+@mainCapi.post('/addcapi')
+async def add_capitulo(numero: int = Body(...), fecha: str = Body(...), idioma: str = Body(...), obra: UUID = Body(...)):
     try:
-        numero = request.json['numero']
-        fecha = request.json['fecha']
-        idioma = request.json['idioma']
         capi = Capitulo('', numero, fecha, idioma)
-        affec_row = CapituloModel.add_capitulo(capi, request.json['obra'])
+        affec_row = CapituloModel.add_capitulo(capi, obra)
         if affec_row == 0:
-            return jsonify({'message': "Error on insert"})
-        return jsonify({'message':"Ok"})
+            return ({'message': "Error on insert"})
+        return ({'message':"Ok"})
     except Exception as ex:
-        return jsonify({'message':str(ex)}),500
+        return ({'message':str(ex)}),500

@@ -1,6 +1,6 @@
-from flask import Blueprint, jsonify, request
+from fastapi import APIRouter, UploadFile, Path, Body
 from models.ArtistModel import ArtistModel
 from models.UsuarioModel import UsuarioModel
 from models.TraductorModel import TraductorModel
 
-mainUser = Blueprint('users_blueprint', __name__)
+mainUser = APIRouter(prefix="/user", tags=['users'], responses={404: {"description": "Not found"}})
