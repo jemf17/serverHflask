@@ -25,6 +25,6 @@ async def delete_coment_id(id):
 async def get_coment_user(user):
     try:
         coments = ComentarioModel().get_all_coments_by_user(user)
-        return jsonify(coments)
+        return coments
     except Exception as ex:
-        return jsonify({'message':str(ex)}),500
+        return {'message':str(ex),'status':500}

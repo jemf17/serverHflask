@@ -5,21 +5,21 @@ from models.entities.Page import Page
 mainPage = APIRouter(prefix="/page", tags=['pages'], responses={404: {"description": "Not found"}})
 
 @mainPage.post('/add')
-def add_page():
+async def add_page():
     try:
         pass
     except Exception as ex:
         return {'message':str(ex),'status':500}
 
 @mainPage.put('/putpage') #o PATCH, no se cual es mejor xd
-def upload_page():
+async def upload_page():
     try:
         pass
     except Exception as ex:
         return {'message':str(ex),'status':500}
     
 @mainPage.delete('/delete')
-def delete_page():
+async def delete_page():
     try:
         pass
     except Exception as ex:

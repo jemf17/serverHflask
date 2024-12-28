@@ -175,3 +175,4 @@ class ObraModel():
                 cursor.execute(f"""SELECT save_obra('{id_obra}', '{id_user}')""")
         except Exception as ex:
             raise Exception(ex)
+    @classmethod
