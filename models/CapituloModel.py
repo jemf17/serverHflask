@@ -6,6 +6,7 @@ from models.PageModel import PageModel
 from concurrent.futures import ThreadPoolExecutor
 from abc import ABC, abstractmethod
 from models.entities.Page import Page
+from uuid import UUID
 
 class CapituloModel():
     def __init__(self, strategy: CapituloStrategy) -> None:
@@ -16,6 +17,12 @@ class CapituloModel():
     @strategy.setter
     def strategy(self, strategy: CapituloStrategy) -> None:
         self._strategy = strategy
+    @classmethod
+    def delete_capi(self, numero:int, id_obra: UUID, id_user:UUID) -> None:
+        try:
+            return self._strategy.delete_capi(numero, id_obra, id_user)
+        except Exception as ex:
+            raise Exception(ex)
     @classmethod
     def get_capitulos_by_obra(self,id_obra):
         try:
@@ -78,12 +85,7 @@ class CapituloModel():
             return afect_rows
         except Exception as ex:
             raise Exception(ex)
-    @classmethod
-    def delete_capitulo(self, id):
-        try:
-            pass
-        except Exception as ex:
-            raise Exception(ex)
+
         
 class CapituloStrategy(ABC):
 
@@ -93,7 +95,11 @@ class CapituloStrategy(ABC):
     @abstractmethod
     def add_capi_pay(self, *args, **kwargs):
         pass
+    @abstractmethod
+    def delete_capi(self, numero: int, obraid: UUID,*args, **kwargs):
+        pass
 class StrategyCapituloArts(CapituloStrategy):
+    @classmethod
     def add_capitulo_free(self, cap, obraid):
         try:
             conection = DB().db_connection()
@@ -108,7 +114,21 @@ class StrategyCapituloArts(CapituloStrategy):
             return afect_rows
         except Exception as ex:
             raise Exception(ex)
+    @classmethod
+    def delete_capi(self, numero: int, id_obra: UUID, id_user: UUID):
+        try:
+            conection = DB().db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""DELETE FROM capitulos WHERE numero = {numero} AND id_obra = '{id_obra}'""")
+                conection.commit()
+                cursor.execute(f"""DELETE FROM pages WHERE numero_cap = {numero} AND id_obra = '{id_obra}'""")
+                conection.commit()
+                afect_rows = cursor.rowcount
+                return afect_rows
+        except Exception as ex:
+            raise Exception(ex)
 class StrategyCapituloScan(CapituloStrategy):
+    @classmethod
     def add_capitulo_free(self, cap, obraid):
         try:
             conection = DB().db_connection()
@@ -121,6 +141,19 @@ class StrategyCapituloScan(CapituloStrategy):
                         afect_rows += tx.submit(PageModel.add_page(page, cap.numero, obraid))
                 
             return afect_rows
+        except Exception as ex:
+            raise Exception(ex)
+    @classmethod
+    def delete_capi(self, numero: int, id_obra: UUID, id_scan: UUID):
+        try:
+            conection = DB().db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""DELETE FROM capitulos_scans WHERE numero = {numero} AND id_obra = '{id_obra}' AND id_scan = '{id_scan}'""")
+                conection.commit()
+                cursor.execute(f"""DELETE FROM pages_scans WHERE numero = {numero} AND id_obra = '{id_obra}' AND id_scan = '{id_scan}'""")
+                conection.commit()
+                afect_rows = cursor.rowcount
+                return afect_rows
         except Exception as ex:
             raise Exception(ex)
     

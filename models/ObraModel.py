@@ -16,7 +16,7 @@ class ObraModel():
             conection = DB().db_connection()
             obras = []
             with closing(conection.cursor()) as cursor:
-                cursor.execute("""SELECT romance,id, titulo, titulo_secundario, portada, oneshot, madure, v.visualizacion, v.favoritos, v.guardados  FROM obras o inner join vistas v on v.id_obra = o.id""") 
+                cursor.execute("""SELECT id, titulo, titulo_secundario, portada, oneshot, madure, v.visualizacion, v.favoritos, v.guardados  FROM obras o inner join vistas v on v.id_obra = o.id""") 
                 resultset = cursor.fetchall()
                 for row in resultset:
                     obra = Obra(row[0], row[1],row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9])
@@ -49,11 +49,15 @@ class ObraModel():
     @classmethod
     def get_obras_for_arts(self, id_arts):
         try:
+            obras = []
             conection = DB().db_connection()
             with closing(conection.cursor()) as cursor:
-                cursor.execute(f"""SELECT romance,id, titulo, titulo_secundario, portada, oneshot, madure, v.visualizacion, v.favoritos, v.guardados  FROM obras o inner join vistas v on v.id_obra = o.id where exists (select oa.id_obra from obras_artistas oa where oa.id_arts = '{id_arts}' and oa.id_obra = o.id )""")
-                conection.commit()
-                return 'Ok'
+                cursor.execute(f"""SELECT id, titulo, titulo_secundario, portada, oneshot, madure, v.visualizacion, v.favoritos, v.guardados  FROM obras o inner join vistas v on v.id_obra = o.id where exists (select oa.id_obra from obras_artistas oa where oa.id_arts = '{id_arts}' and oa.id_obra = o.id )""")
+                resultset = cursor.fetchall()
+                for row in resultset:
+                    obra = Obra(row[0], row[1],row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9])
+                    obras.append(obra.to_JSON_view())
+            return obras
         except Exception as ex:
             raise Exception(ex)        
     @classmethod
@@ -116,11 +120,12 @@ class ObraModel():
         try:
             conection = DB().db_connection()
             with closing(conection.cursor()) as cursor:
-                cursor.execute(f"""select tag1, tag2, tag3, tag4, tag5, tag6, v1, v2, v3, v4, v5, v6 from preferencias p where p.id_user = {id}""")
-                row_user =  cursor.fetchone()
+                #cursor.execute(f"""select tag1, tag2, tag3, tag4, tag5, tag6, v1, v2, v3, v4, v5, v6 from preferencias p where p.id_user = {id}""")
+                #row_user =  cursor.fetchone()
                 #user_np = np.array(row_user[0:5], row_user[6:12])
-                user_pd = pd.DataFrame([row_user[0:5], row_user[6:12]], columns=['tag1, tag2, tag3, tag4, tag5, tag6'], index=['tags', 'value'])
-                cursor.execute(f"""""")
+                #user_pd = pd.DataFrame([row_user[0:5], row_user[6:12]], columns=['tag1, tag2, tag3, tag4, tag5, tag6'], index=['tags', 'value'])
+                #cursor.execute(f"""""")
+                pass
         except Exception as ex:
             raise Exception(ex)
     @classmethod
@@ -176,3 +181,17 @@ class ObraModel():
         except Exception as ex:
             raise Exception(ex)
     @classmethod
+    def search_obra(self, search, next):
+        try:
+            obras = []
+            conection = DB().db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""select distinct o.id,o.titulo,o.titulo_secundario, o.portada, v.visualizacion,v.favoritos,v.guardados , o.fechacreate from obras o inner join obras_tags ot on o.id = ot.id_obra inner join vistas v on v.id_obra = o.id  where '{search}' LIKE CONCAT('%', ot.tag, '%') or o.titulo like '%{search}%' or o.titulo_secundario like '%{search}%' order by o.fechacreate LIMIT 20 OFFSET {next*20}""")
+                resultset = cursor.fetchall()
+                resultset = cursor.fetchall()
+                for row in resultset:
+                    obra = Obra(row[0], row[1],row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9])
+                    obras.append(obra.to_JSON_view())
+            return obras
+        except Exception as ex:
+            raise Exception(ex)

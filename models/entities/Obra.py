@@ -36,6 +36,7 @@ class Obra():
             'id': self.id,
             'titulo': self.titulo,
             'portada': self.portada,
+            'oneshot': self.oneshot,
             'vistas' : self.vistas,
             'likes' : self.likes,
             'guardados': self.guardados

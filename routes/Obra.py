@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, Path, Body
+from fastapi import APIRouter, UploadFile, Path, Body, HTTPException
 from models.ObraModel import ObraModel
 from models.entities.Obra import Obra
 from models.entities.Capitulo import Capitulo
@@ -40,7 +40,7 @@ async def get_obras_for_user(id: UUID = Path(...)):
 @mainObra.get('/{artist}')
 async def get_obras_for_artist(artist: UUID = Path(...)):
     try:
-        return {'tu':"mama"}
+        return {'obras': ObraModel().get_obras_for_arts(artist)}
     except Exception as ex:
         return {'message':str(ex),'status':500}
     
@@ -85,6 +85,7 @@ async def exist_obra(title: str=Path(...)):
     except Exception as ex:
         return {'message':str(ex),'status':500}
 
+#considerar de dejarlo o no
 @mainObra.get('/getuuid')
 async def create_uuid():
     try:
@@ -105,5 +106,16 @@ async def fav(id_obra: UUID=Path(...), id_user: UUID=Path(...)):
     try:
         ObraModel.like_obra(id_obra, id_user)
         return {'message': 'Ok'}
+    except Exception as ex:
+        return {'message':str(ex),'status':500}
+
+#retorna las obras buscadas
+@mainObra.get('/search/{search}/{next}')
+async def search(search: str=Path(...), next: int=Path(...)):
+    try:
+        if next < 0:
+            raise HTTPException(status_code=404, detail="numero negativo error")
+        search_cleaned = search.replace('&', ' ')
+        return {'obras':ObraModel.search_obra(search_cleaned, next)}
     except Exception as ex:
         return {'message':str(ex),'status':500}

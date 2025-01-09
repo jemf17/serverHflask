@@ -1,5 +1,5 @@
 class Capitulo():
-    def __init__(self, numero, fecha, idioma, pages = []) -> None:
+    def __init__(self, numero, fecha, idioma,pages = []) -> None:
         #self.id = id
         self.numero = numero
         self.idioma = idioma

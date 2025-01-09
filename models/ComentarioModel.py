@@ -2,11 +2,12 @@ from database.db_connection import DB
 from .entities.Comentario import *
 from contextlib import closing
 from concurrent.futures import ThreadPoolExecutor
+from uuid import UUID
 
 class ComentarioModel():
 
     @classmethod
-    def get_all_coments_by_obra(self, id_obra):
+    def get_all_coments_by_obra(self, id_obra: UUID):
         try:
             coments = list()
             conection = DB().db_connection()
