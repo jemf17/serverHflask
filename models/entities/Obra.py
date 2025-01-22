@@ -1,6 +1,6 @@
 class Obra():
 
-    def __init__(self,id, titulo,titulosecu,  portada, oneshot ,madure,vistas = 0, likes = 0, guardados = 0, capitulo = [], tag = [] ,comentario = [], artista =[]) -> None:
+    def __init__(self,id, titulo,titulosecu,  portada, oneshot ,madure,vistas = 0, likes = 0, guardados = 0, capitulo = [], tag = [] , artista =[]) -> None:
         self.id = id
         self.titulo = titulo
         self.titulosecu = titulosecu
@@ -13,7 +13,7 @@ class Obra():
         self.tag = tag
         self.capitulo = capitulo
         self.artista = artista
-        self.comentario = comentario
+        
     
     def to_JSON(self):
         return {
@@ -26,7 +26,6 @@ class Obra():
             'likes': self.likes,
             'guardados': self.guardados,
             'capitulos': self.capitulo,
-            'comentarios': self.comentario,
             'arts': self.artista,
             'tags': self.tag #no creo que haga falta hacerlo una clase ya que con simplemente una consulta SQL, basta para dar todos los nombres de los Tags
                 #'tags': self.to_JSON_tag() 

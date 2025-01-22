@@ -3,6 +3,7 @@ from database.db_connection import DB
 from .entities.Page import Page
 from contextlib import closing
 from abc import ABC, abstractmethod
+from uuid import UUID
 
 class PageModel():
     def __init__(self, strategy: PageStrategy) -> None:
@@ -14,14 +15,12 @@ class PageModel():
     def strategy(self, strategy: PageStrategy) -> None:
         self._strategy = strategy
     @classmethod
-    def get_pages_by_capitulo(self, obra_id, numero):
+    def get_pages_by_capitulo(self, obra_id:UUID, numero:int):
         try:
             conection = DB().db_connection()
             pages = []
             with closing(conection.cursor()) as cursor:
-                print('inicio error')
-                cursor.execute(f"""SELECT id_obra, numero_cap, imagen, orden FROM pages p WHERE p.id_obra = '{obra_id}' AND p.numero_cap = {numero} """) 
-                print('fin error')
+                cursor.execute(f"""SELECT id_obra, numero_cap, imagen, orden FROM pages p WHERE p.id_obra = '{obra_id}' AND p.numero_cap = {numero} order by orden""") 
                 resultset = cursor.fetchall()
                 print(resultset)
                 for row in resultset:
@@ -32,44 +31,68 @@ class PageModel():
         except Exception as ex:
             raise Exception(ex)
     @classmethod
-    def count_pages_by_capitulo(self, id_obra, numero_capi):
+    def get_pages_by_capitulo_scan(self, obra_id:UUID, numero:int, id_scan:UUID):
         try:
-            pass
-        except Exception as ex:
-            raise Exception(ex)
-    @classmethod
-    def update_page(self, id):
-        try:
-            pass
-        except Exception as ex:
-            raise Exception(ex)
-    @classmethod
-    def add_page(self, page, capNumero, obra_id):
-        try:
-            """
-            datos para agregar: imagen:bytea, orden: int => para hacer subconsultas: CapNumero: Int, obra_id: varchar
-            """
             conection = DB().db_connection()
-            #img_url =  save_img(page.image)
-            #if img_url == -1:
-            #    return -1
-            #creo que es mejor opcion que se guarde directamente las imagenes en el front
+            pages = []
             with closing(conection.cursor()) as cursor:
-                cursor.execute(f"INSERT INTO Pages (imagen, orden, numero_cap, id_obra) VALUES ('{page.image}', {page.orden},{capNumero},'{obra_id}')")
+                cursor.execute(f"""SELECT id_obra, numero_cap, imagen, orden FROM pages_scans ps WHERE ps.id_obra = '{obra_id}' AND ps.numero_cap = {numero} AND ps.id_scan = {id_scan} order by orden""") 
+                resultset = cursor.fetchall()
+                print(resultset)
+                for row in resultset:
+                    page = Page(row[0], row[1], row[2], row[3])
+                    print(page.to_JSON())
+                    pages.append(page.to_JSON())
+        except Exception as ex:
+            raise Exception(ex)
+    @classmethod
+    def update_page(self, id_obra:UUID, numero:int, orden:int,*args, **kwargs):
+        try:
+            pass
+        except Exception as ex:
+            raise Exception(ex)
+    @classmethod
+    def add_page(self, page:Page):
+        try:
+            return self._strategy.add_page(page)
+        except Exception as ex:
+            raise Exception(ex)
+class PageStrategy(ABC):
+    @abstractmethod
+    def add_page(self, page:Page):
+        pass
+    @abstractmethod
+    def update_page(self, id_obra, numero, orden, *args, **kwargs):
+        pass
+class StrategyPageArts(PageStrategy):
+    @classmethod
+    def add_page(self, page:Page):
+        try:
+            conection = DB().db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""INSERT INTO Pages (imagen, orden, numero_cap, id_obra) 
+                               VALUES ('{page.image}', {page.orden},{page.numero},'{page.id}')""")
                 conection.commit()
                 afect_rows = cursor.rowcount
             return afect_rows
         except Exception as ex:
             raise Exception(ex)
-class PageStrategy(ABC):
-    @abstractmethod
-    def add_page(self, page, capNumero, obra_id):
-        pass
-class StrategyPageArts(PageStrategy):
     @classmethod
-    def add_page(self, page, capNumero, obra_id):
+    def update_page(self, id_obra, numero, orden, *args, **kwargs):
         pass
 class StrategyPageScan(PageStrategy):
     @classmethod
-    def add_page(self, page, capNumero, obra_id):
+    def add_page(self, page:Page):
+        try:
+            conection = DB().db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""INSERT INTO pages_scans (imagen, orden, numero, id_obra, id_scan) 
+                               VALUES ('{page.image}', {page.orden},{page.numero},'{page.id}', '{page.id_scan}')""")
+                conection.commit()
+                afect_rows = cursor.rowcount
+            return afect_rows
+        except Exception as ex:
+            raise Exception(ex)
+    @classmethod
+    def update_page(self, id_obra, numero, orden, *args, **kwargs):
         pass

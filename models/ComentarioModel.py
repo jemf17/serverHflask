@@ -16,17 +16,32 @@ class ComentarioModel():
                 result = cursor.fetchall()
                 with ThreadPoolExecutor() as tx:
                     for row in result:
-                        coment = ContextComentario(ComentUser(row[0],row[1],row[2]))
-                        coments.append(coment.someone_strategy_json_coment())
+                        coment = ComentUser(row[0],row[1],row[2])
+                        coments.append(coment.to_JSON())
             return coments
         except Exception as ex:
             raise Exception(ex)
     @classmethod
-    def add_coment(self, id_obra ,coment):
+    def get_all_coments_by_capi(self, id_obra: UUID, numero:int):
+        try:
+            coments = list()
+            conection = DB().db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""SELECT fecha, comentario, id_user FROM comentarios c WHERE id_obra = '{id_obra}' and capitulo = {numero}""")
+                result = cursor.fetchall()
+                with ThreadPoolExecutor() as tx:
+                    for row in result:
+                        coment = ComentUser(row[0],row[1],row[2])
+                        coments.append(coment.to_JSON())
+            return coments
+        except Exception as ex:
+            raise Exception(ex)
+    @classmethod
+    def add_coment(self, id_obra:UUID ,coment, numero:int):
         try:
             conection = DB().db_connection()
             with closing(conection.cursor()) as cursor:
-                cursor.execute(f"""insert into comentarios (id_user, id_obra, fecha, comentario) values ('{coment.usuario}','{id_obra}', '{coment.fecha}', '{coment.descripcion}')""")
+                cursor.execute(f"""insert into comentarios (id_user, id_obra, fecha, comentario, capitulo) values ('{coment.usuario}','{id_obra}', '{coment.fecha}', '{coment.descripcion}', {numero})""")
                 conection.commit()
                 afect_rows = cursor.rowcount
                 return afect_rows
@@ -54,6 +69,21 @@ class ComentarioModel():
                 with ThreadPoolExecutor() as tx:
                     for row in result:
                         coment = ContextComentario(ComentObra(row[0],row[1],row[2]))
+                        coments.append(coment.someone_strategy_json_coment())
+            return coments
+        except Exception as ex:
+            raise Exception(ex)
+    @classmethod
+    def get_coment_by_capitulo(self, id_obra: UUID, capitulo: int):
+        try:
+            coments = []
+            conection = DB().db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""SELECT fecha, comentario, id_user FROM comentarios c WHERE id_obra = '{id_obra}' AND capitulo = {capitulo}""")
+                result = cursor.fetchall()
+                with ThreadPoolExecutor() as tx:
+                    for row in result:
+                        coment = ContextComentario(ComentUser(row[0].isoformat(),row[1],row[2]))
                         coments.append(coment.someone_strategy_json_coment())
             return coments
         except Exception as ex:
