@@ -47,20 +47,42 @@ class CapituloModel():
         except Exception as ex:
             raise Exception(ex)
     @classmethod
-    def get_capitulo_by_obra(self, id_obra, numero):
+    def get_capitulo_by_obra(self, id_obra: UUID, numero:int):
         try:
             conection = DB().db_connection()
             #obra original
             with closing(conection.cursor()) as cursor:
-                cursor.execute(f"""SELECT numero, fecha, (SELECT nombre FROM idiomas WHERE Capitulos.id_idioma = idiomas.nombre ) as idioma FROM Capitulos WHERE Capitulos.id_obra = '{id_obra}' AND Capitulos.numero = {numero} ORDER BY idioma, numero""")
+                cursor.execute(f"""SELECT numero, fecha, id_idioma, price FROM Capitulos WHERE Capitulos.id_obra = '{id_obra}' AND Capitulos.numero = {numero}""")
                 row = cursor.fetchone()
                 cap = None
                 if row != None:
                     pages = PageModel.get_pages_by_capitulo(id_obra, numero)
-                    cap = Capitulo(row[0],row[1],row[2],pages)
+                    coments = ComentarioModel.get_all_coments_by_capi(id_obra, numero) 
+                    cap = Capitulo(row[0],row[1],row[2],row[3],pages, coments)
                     cap = cap.to_JSON()
             return cap
 
+        except Exception as ex:
+            raise Exception(ex)
+    @classmethod
+    def get_capitulo_by_obra_scan(self, id_obra:UUID, numero:int, id_scan:UUID):
+        try:
+            conection = DB().db_connection()
+            #obra original
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""SELECT numero, fecha, id_idioma, price FROM Capitulos_scans 
+                               WHERE Capitulos_scans.id_obra = '{id_obra}' AND 
+                               Capitulos_scans.numero = {numero} AND 
+                               Capitulos_scans.id_scan = '{id_scan}'""")
+                row = cursor.fetchone()
+                cap = None
+                if row!= None:
+                    pages = PageModel.get_pages_by_capitulo_scan(id_obra, numero, id_scan)
+                    print(pages)
+                    coments = ComentarioModel.get_all_coments_by_capi(id_obra, numero) 
+                    cap = Capitulo(row[0],row[1],row[2], row[3], pages, coments)
+                    cap = cap.to_JSON_scan(id_scan)
+            return cap
         except Exception as ex:
             raise Exception(ex)
     @classmethod
@@ -78,6 +100,15 @@ class CapituloModel():
             conection = DB().db_connection()
             with closing(conection.cursor()) as cursor:
                 cursor.execute(f"""SELECT max(numero) FROM capitulos WHERE id_obra = '{id_obra}'""")
+                return cursor.fetchone()[0]
+        except Exception as ex:
+            raise Exception(ex)
+    @classmethod
+    def idioma_original(self, id_obra: UUID, numero:int):
+        try:
+            conection = DB().db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""select c.id_idioma from capitulos c where c.id_obra = '{id_obra}' and c.numero ={numero}""")
                 return cursor.fetchone()[0]
         except Exception as ex:
             raise Exception(ex)
@@ -128,17 +159,20 @@ class StrategyCapituloArts(CapituloStrategy):
             raise Exception(ex)
 class StrategyCapituloScan(CapituloStrategy):
     @classmethod
-    def add_capitulo(self, cap:Capitulo, obraid:UUID):
+    def add_capitulo(self, cap:Capitulo, obraid:UUID, id_scan:UUID):
         try:
+            future = []
             conection = DB().db_connection()
             with closing(conection.cursor()) as cursor:
-                cursor.execute(f"""INSERT INTO capitulos_scans (numero, id_obra, fecha, id_idioma, price) VALUES ({cap.numero},{obraid},{cap.fecha},{cap.id_idioma}, {cap.price})""")
+                cursor.execute(f"""INSERT INTO capitulos_scans (numero, id_obra, fecha, id_idioma, price, id_scan) VALUES ({cap.numero},'{obraid}','{cap.fecha}','{cap.idioma}',{cap.price},'{id_scan}')""")
                 conection.commit()
                 afect_rows = cursor.rowcount
-                with ThreadPoolExecutor as tx:
-                    for page in cap.pages:
-                        afect_rows += tx.submit(PageModel.add_page(page, cap.numero, obraid))
-                
+                with ThreadPoolExecutor() as tx:
+                    for orden in range(len(cap.pages)):
+                        pag = Page(obraid, cap.numero, cap.pages[orden], orden+1, id_scan)
+                        future.append(tx.submit(StrategyPageScan.add_page(pag)))
+                    print(future)
+                    afect_rows += len(future)
             return afect_rows
         except Exception as ex:
             raise Exception(ex)

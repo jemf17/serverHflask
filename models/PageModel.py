@@ -22,10 +22,9 @@ class PageModel():
             with closing(conection.cursor()) as cursor:
                 cursor.execute(f"""SELECT id_obra, numero_cap, imagen, orden FROM pages p WHERE p.id_obra = '{obra_id}' AND p.numero_cap = {numero} order by orden""") 
                 resultset = cursor.fetchall()
-                print(resultset)
                 for row in resultset:
                     page = Page(row[0], row[1], row[2], row[3])
-                    print(page.to_JSON())
+                    #print(page.to_JSON())
                     pages.append(page.to_JSON())
             return pages    
         except Exception as ex:
@@ -36,13 +35,13 @@ class PageModel():
             conection = DB().db_connection()
             pages = []
             with closing(conection.cursor()) as cursor:
-                cursor.execute(f"""SELECT id_obra, numero_cap, imagen, orden FROM pages_scans ps WHERE ps.id_obra = '{obra_id}' AND ps.numero_cap = {numero} AND ps.id_scan = {id_scan} order by orden""") 
+                cursor.execute(f"""SELECT id_obra, numero, imagen, orden FROM pages_scans ps WHERE ps.id_obra = '{obra_id}' AND ps.numero = {numero} AND ps.id_scan = '{id_scan}' order by orden""") 
                 resultset = cursor.fetchall()
                 print(resultset)
                 for row in resultset:
                     page = Page(row[0], row[1], row[2], row[3])
-                    print(page.to_JSON())
                     pages.append(page.to_JSON())
+            return pages
         except Exception as ex:
             raise Exception(ex)
     @classmethod

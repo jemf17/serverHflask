@@ -98,6 +98,16 @@ class ObraModel():
         except Exception as ex:
             raise Exception(ex)
     @classmethod
+    def exist_obra_by_id(self, id_obra: UUID):
+        try:
+            conection = DB().db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""select exists (select 1 from obras o where o.id = '{id_obra}')""")
+                return cursor.fetchone()[0]
+        except Exception as ex:
+            raise Exception(ex)
+        
+    @classmethod
     def add_obra(self, obra: Obra, tags, arts, cap):
         try:
             conection = DB().db_connection()
@@ -294,5 +304,21 @@ class ObraModel():
                                 """)
                 result = cursor.fetchone()
             return result[0]
+        except Exception as ex:
+            raise Exception(ex)
+    @classmethod
+    def artis_permition(id_art:UUID, id_obra:UUID):
+        try:
+            conection = DB().db_connection()
+            with closing(conection.cursor()) as cursor:
+                cursor.execute(f"""SELECT 
+                                    EXISTS (
+                                        SELECT 1 
+                                        FROM obras 
+                                        WHERE artista = '{id_art}' AND id = '{id_obra}'
+                                    ) AS permiso
+                                    """)
+                resultset = cursor.fetchone()
+            return resultset[0]
         except Exception as ex:
             raise Exception(ex)

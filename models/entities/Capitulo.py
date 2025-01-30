@@ -32,6 +32,7 @@ class Capitulo():
             'numero': self.numero,
             'idioma': self.idioma,
             'fecha': self.fecha,
-            'pages': self.pages
+            'pages': self.pages,
+            'comentario': self.comentario
         }
         

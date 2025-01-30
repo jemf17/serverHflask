@@ -30,7 +30,7 @@ class TagModel():
                         inner join vistas v on v.id_obra = o.id 
                         inner join obras_tags ot on ot.id_obra = o.id 
                         inner join capitulos c on c.id_obra = o.id 
-                        where ot.tag = {tag}
+                        where ot.tag = '{tag}'
                         group by id, titulo, titulo_secundario, portada, oneshot, madure, 
                         v.visualizacion, v.favoritos, v.guardados 
                         order by ultimafecha LIMIT 20 OFFSET {next*20}""") 
@@ -69,7 +69,10 @@ class TagModel():
                         FROM obras o 
                         inner join vistas v on v.id_obra = o.id 
                         inner join obras_tags ot on ot.id_obra = o.id 
-                        where ot.tag = {tag}
+                        inner join capitulos c on c.id_obra = o.id 
+                        where ot.tag = '{tag}'
+                        group by id, titulo, titulo_secundario, portada, oneshot, madure, 
+                        v.visualizacion, v.favoritos, v.guardados
                         order by v.visualizacion LIMIT 20 OFFSET {next*20}""") 
                 resultset = cursor.fetchall()
                 for row in resultset:
